@@ -8,6 +8,8 @@ import java.util.concurrent.Executor;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
+import com.endlesshorizon.router.utils.*;
+
 public class MarketListener {
 	private static final int marketPort = 5001;
 
@@ -17,7 +19,7 @@ public class MarketListener {
 
 	public void initiate() throws IOException {
 		this.marketSocket = new ServerSocket(marketPort);
-		System.out.println("[MARKET_SERVER] Waiting for client connection...");
+		System.out.println(Prefixes.FM_MS + "Waiting for client connection...");
 
 	}
 
@@ -29,9 +31,9 @@ public class MarketListener {
 			//try to accept any incoming connections if none it will stay null if error it will print error
 			marketClient = this.marketSocket.accept();
 			// once the client is connected onto brokerSocket port
-			System.out.println("[MARKET_SERVER] Connected to client!");
+			System.out.println(Prefixes.FM_MS + "Connected to client!");
 		} catch (IOException e) {
-			System.out.println("I/O error: " + e);
+			System.out.println(Prefixes.FM_MS_Error + "I/O error: " + e);
 		}
 		// if a market client has connected create a new market thread for them
 		if (marketClient != null){
@@ -42,11 +44,11 @@ public class MarketListener {
 			// execute the newly created thread
 			pool.execute(marketClientThread);
 		} else {
-			System.out.println("I/O error: ");
+			System.out.println(Prefixes.FM_MS_Error + "I/O error: ");
 		}
 	}
 
-	public void start() throws IOException {
-		initiate();
-	}
+	//public void start() throws IOException {
+	//	initiate();
+	//}
 }

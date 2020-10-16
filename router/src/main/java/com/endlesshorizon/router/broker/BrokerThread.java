@@ -4,7 +4,8 @@ import java.io.*;
 import java.net.ServerSocket;
 import java.net.Socket;
 
-import com.endlesshorizon.router.utils.RouterUtils;
+import com.endlesshorizon.router.utils.*;
+
 
 public class BrokerThread implements Runnable {
 	private Socket brokerClient;
@@ -15,11 +16,11 @@ public class BrokerThread implements Runnable {
 	public BrokerThread(Socket clientSocket) throws IOException {
 		this.brokerClient = clientSocket;
 		
-		//
+		// connect to the sockets input stream (this is where the server will read what the client types)
 		this.in = new BufferedReader(new InputStreamReader(this.brokerClient.getInputStream()));
 		
 		
-		//
+		// connect to the sockets output stream (this is where the server will write stuff to the client)
 		this.out = new PrintWriter(this.brokerClient.getOutputStream(), true);
 	}
 
@@ -28,20 +29,22 @@ public class BrokerThread implements Runnable {
 		try {
 			// generate the UID for the broker
 			String UID = RouterUtils.generateID();
-			System.out.println("[BROKER_CLIENT] joined: " + UID);
+			System.out.println(Prefixes.FM_BC + "joined: " + UID);
 			
-			this.out.println("[BROKER_SERVER] This is your UID: " + UID);
+			this.out.println(Prefixes.FM_BS + "This is your UID: " + UID);
 			this.out.flush();
 			while (true) {
+				// wait for an input from the broker client
 				String request = in.readLine();
 
-				this.out.println("[BROKER_SERVER] recieved this message: " + request);
-				System.out.println("[BROKER_CLIENT_UID:" + UID + "] message: " + request);
+				//once an input is received print it out to the client aswell as to the server console
+				this.out.println(Prefixes.FM_BS + "recieved this message: " + request);
+				System.out.println(Prefixes.FM_BCS + UID + Prefixes.ANSI_WHITE +"] message: " + request);
 			}
 		} catch (IOException e) {
-			System.err.println("IO exception in BrokerThread");
-			System.out.print(e);
-			System.err.println(e.getStackTrace());
+			System.err.println(Prefixes.FM_BS_Error + "IO exception in BrokerThread");
+			System.out.print(Prefixes.FM_BS_Error + e);
+			System.err.println(Prefixes.FM_BS_Error + e.getStackTrace());
 		} finally {
 			this.out.close();
 			try {
@@ -52,4 +55,6 @@ public class BrokerThread implements Runnable {
 			}
 		}
 	}
+
+
 }

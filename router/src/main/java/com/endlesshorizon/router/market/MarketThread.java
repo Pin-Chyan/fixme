@@ -4,6 +4,7 @@ import java.io.*;
 import java.net.ServerSocket;
 import java.net.Socket;
 
+import com.endlesshorizon.router.utils.Prefixes;
 import com.endlesshorizon.router.utils.RouterUtils;
 
 public class MarketThread implements Runnable{
@@ -28,22 +29,22 @@ public class MarketThread implements Runnable{
 		try {
 			// generate the UID for the broker
 			String UID = RouterUtils.generateID();
-			System.out.println("[MARKET_CLIENT] joined: " + UID);
+			System.out.println(Prefixes.FM_MC + "joined: " + UID);
 			
-			this.out.println("[MARKET_SERVER] This is your UID: " + UID);
+			this.out.println(Prefixes.FM_MS + "This is your UID: " + UID);
 			this.out.flush();
 			while (true) {
 				// wait for an input from the market client
 				String request = in.readLine();
 
 				//once an input is received print it out to the client aswell as to the server console
-				this.out.println("[MARKET_SERVER] recieved this message: " + request);
-				System.out.println("[MARKET_CLIENT_UID:" + UID + "] message: " + request);
+				this.out.println(Prefixes.FM_MS + "recieved this message: " + request);
+				System.out.println(Prefixes.FM_MCS + UID + Prefixes.ANSI_WHITE + "] message: " + request);
 			}
 		} catch (IOException e) {
-			System.err.println("IO exception in MarketThread");
-			System.out.print(e);
-			System.err.println(e.getStackTrace());
+			System.err.println(Prefixes.FM_MS_Error + "IO exception in MarketThread");
+			System.out.print(Prefixes.FM_MS_Error + e);
+			System.err.println(Prefixes.FM_MS_Error + e.getStackTrace());
 		} finally {
 			this.out.close();
 			try {
