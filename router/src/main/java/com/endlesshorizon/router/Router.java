@@ -4,13 +4,14 @@ import java.io.*;
 //import java.net.ServerSocket;
 //import java.net.Socket;
 
+import com.endlesshorizon.router.utils.*;
 import com.endlesshorizon.router.broker.*;
 import com.endlesshorizon.router.market.*;
 
 public class Router {
 
 	public static void main(String[] arg) throws IOException, InterruptedException {
-		System.out.println("[Server is online].");
+		System.out.println(Prefixes.FM_S);
 
 		//create the listeners on each port for the markets and brokers
 		BrokerListener broker = new BrokerListener();
