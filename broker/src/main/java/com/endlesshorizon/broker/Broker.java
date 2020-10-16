@@ -12,9 +12,14 @@ public class Broker {
 		Socket client = new Socket(SERVER_IP, SERVER_PORT);
 
 		BufferedReader input = new BufferedReader(new InputStreamReader(client.getInputStream()));
+
+		// keyboard inputs which are getting read in
 		BufferedReader keyboard = new BufferedReader(new InputStreamReader(System.in));
 		
 		while (true) {
+			String serverResponse = input.readLine();
+			System.out.println(serverResponse);
+
 			PrintWriter out = new PrintWriter(client.getOutputStream(), true);
 			System.out.print("> ");
 			String command = keyboard.readLine();
@@ -25,8 +30,6 @@ public class Broker {
 				break;
 			}
 	
-			String serverResponse = input.readLine();
-			System.out.println(serverResponse);
 		}
 
 		client.close();
