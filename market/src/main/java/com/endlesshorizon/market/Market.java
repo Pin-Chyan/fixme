@@ -1,9 +1,9 @@
-package com.endlesshorizon.market;
+//package com.endlesshorizon.market;
 
-import java.io.*;
+//import java.io.*;
 
-public class Market {
-    public static void main(String[] args) {
-		System.out.println("Market works");
-    }
-}
+//public class Market {
+//    public static void main(String[] args) {
+//		System.out.println("Market works");
+//    }
+//}

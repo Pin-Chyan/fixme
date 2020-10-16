@@ -1,0 +1,5 @@
+<factorypath>
+    <factorypathentry kind="VARJAR" id="M2_REPO/org/json/json/20180813/json-20180813.jar" enabled="true" runInBatchMode="false"/>
+    <factorypathentry kind="VARJAR" id="M2_REPO/org/xerial/sqlite-jdbc/3.28.0/sqlite-jdbc-3.28.0.jar" enabled="true" runInBatchMode="false"/>
+    <factorypathentry kind="VARJAR" id="M2_REPO/org/projectlombok/lombok/1.18.14/lombok-1.18.14.jar" enabled="true" runInBatchMode="false"/>
+</factorypath>
