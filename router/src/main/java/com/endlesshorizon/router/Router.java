@@ -12,38 +12,41 @@ public class Router {
 	public static void main(String[] arg) throws IOException, InterruptedException {
 		System.out.println("[Server is online].");
 
+		//create the listeners on each port for the markets and brokers
 		BrokerListener broker = new BrokerListener();
 		MarketListener market = new MarketListener();
+		// start the listeners
 		broker.start();
 		market.start();
-		Thread brokerThread = new Thread() {
-			public void run() {
-				try {
-					broker.tryBrokerSocket();
-				} catch (IOException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				}
-			}
-		};
-
-		Thread marketThread = new Thread() {
-			public void run() {
-				try {
-					market.tryMarketSocket();
-				} catch (IOException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				}
-			}
-		};
 		while (true) {
-			Thread.sleep(5000);
-			
+			// once per second it creates 2 threads that will run simultaneously to check wether there are new connection requests to the respective listeners
+			Thread.sleep(1000);
+
+			// creates the threads
+			Thread brokerThread = new Thread() {
+				public void run() {
+					try {
+						broker.tryBrokerSocket();
+					} catch (IOException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
+				}
+			};
+			Thread marketThread = new Thread() {
+				public void run() {
+					try {
+						market.tryMarketSocket();
+					} catch (IOException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
+				}
+			};
+
+			//runs the newly created threads
 			brokerThread.start();
 			marketThread.start();
-			brokerThread.join();
-			marketThread.join();
 		}
 
 	}

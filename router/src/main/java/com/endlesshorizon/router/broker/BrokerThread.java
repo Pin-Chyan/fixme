@@ -40,6 +40,7 @@ public class BrokerThread implements Runnable {
 			}
 		} catch (IOException e) {
 			System.err.println("IO exception in BrokerThread");
+			System.out.print(e);
 			System.err.println(e.getStackTrace());
 		} finally {
 			this.out.close();

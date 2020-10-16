@@ -24,21 +24,30 @@ public class BrokerListener {
 
 	public void tryBrokerSocket() throws IOException {
 		// Creation of the port 5000
-		try(Socket brokerClient = brokerSocket.accept()) {
+		Socket brokerClient = null;
+		try {
+			brokerClient = brokerSocket.accept();
 			// once the client is connected onto brokerSocket port
 			
 			System.out.println("[BROKER_SERVER] Connected to client!");
-		
+		} catch (IOException e) {
+			System.out.println("I/O error: " + e);
+		}
+		// System.out.print(pool);
+		if (brokerClient != null){
 			// lead them to their own thread of doing its own work (think of it as a assistant for just this one client)
 			BrokerThread brokerClientThread = new BrokerThread(brokerClient);
 			brokers.add(brokerClientThread);
 			pool.execute(brokerClientThread);
+			// System.out.print(pool);
 
 			// Used to check broker arrays
 			//for (int i = 0; i < brokers.size();i++)
 			//{ 
 			//	System.out.println("[SERVER] Broker Array: [" + brokers.get(i) + "]");
 			//}
+		} else {
+			System.out.println("I/O error: ");
 		}
 	}
 
