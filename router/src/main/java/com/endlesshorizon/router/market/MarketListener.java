@@ -48,7 +48,7 @@ public class MarketListener {
 		}
 	}
 
-	//public void start() throws IOException {
-	//	initiate();
-	//}
+	public void start() throws IOException {
+		initiate();
+	}
 }

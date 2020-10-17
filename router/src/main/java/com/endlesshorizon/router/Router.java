@@ -17,39 +17,37 @@ public class Router {
 		BrokerListener broker = new BrokerListener();
 		MarketListener market = new MarketListener();
 		// start the listeners
-		broker.initiate();
-		market.initiate();
+		broker.start();
+		market.start();
 		while (true) {
 			// once per second it creates 2 threads that will run simultaneously to check wether there are new connection requests to the respective listeners
 			Thread.sleep(1000);
 
 			// creates the threads
-			Thread brokerThread = new Thread();
-			createBrokerSocket(broker);
-			Thread marketThread = new Thread();
-			createMarketSocket(market);
+			Thread brokerThread = new Thread() {
+				public void run() {
+					try {
+						broker.tryBrokerSocket();
+					} catch (IOException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
+				}
+			};
+			Thread marketThread = new Thread() {
+				public void run() {
+					try {
+						market.tryMarketSocket();
+					} catch (IOException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
+				}
+			};
 
 			//runs the newly created threads
 			brokerThread.start();
 			marketThread.start();
-		}
-	}
-
-	private static void createBrokerSocket(BrokerListener broker) {
-		try {
-			broker.tryBrokerSocket();
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-	}
-
-	private static void createMarketSocket(MarketListener market) {
-		try {
-			market.tryMarketSocket();
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
 		}
 	}
 }

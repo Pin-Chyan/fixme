@@ -14,6 +14,7 @@ public class BrokerListener {
 	private static final int brokerPort = 5000;
 
 	private static ArrayList<BrokerThread> brokers  = new ArrayList<>();
+	private static ArrayList<String> brokerUIDS  = new ArrayList<>();
 	private static ExecutorService pool = Executors.newFixedThreadPool(4);
 	private ServerSocket brokerSocket = null;
 
@@ -56,8 +57,22 @@ public class BrokerListener {
 		}
 	}
 
-	//public void start() throws IOException {
-	//	initiate();
-	//}
+	public static boolean verifyBrokerUID(String UID){
+		System.out.print(brokerUIDS + "\n");
+		if (brokerUIDS.contains(UID)){
+			return true;
+		} else {
+			return false;
+		}
+	}
+	public static void addBrokerUID(String UID){
+		brokerUIDS.add(UID);
+	}
+	public static void removeBrokerUID(String UID){
+		brokerUIDS.remove(brokerUIDS.indexOf(UID));
+	}
+	public void start() throws IOException {
+		initiate();
+	}
 
 }
