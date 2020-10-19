@@ -34,7 +34,7 @@ public class MyPanel extends JPanel {
 	private static int Insprice;
 	private static String Insname;
 	private static String Insmarket;
-	
+	@SuppressWarnings("unchecked")
 	public MyPanel() {
 		//construct preComponents
         String[] jcomp3Items = {};
@@ -139,7 +139,7 @@ public class MyPanel extends JPanel {
 			// Insprice = Integer.parseInt(values[1].replaceAll("[^\\d.]", ""));
 		}
 	}
-
+	
 	private static void SetMarket(String Name) {
 		Insmarket = Name;
 		jcomp8.setText(Name);
@@ -154,7 +154,7 @@ public class MyPanel extends JPanel {
 			loadInstruments(jcomp3Items);
 		}
 	}
-
+	@SuppressWarnings("unchecked")
 	private static void loadInstruments(String[] Instruments) {
 		jcomp3.setListData(Instruments);
 	}
