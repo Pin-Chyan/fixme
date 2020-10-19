@@ -4,6 +4,8 @@ import java.io.*;
 import java.net.Socket;
 import java.net.UnknownHostException;
 
+import com.endlesshorizon.broker.valids.Messages;
+
 public class Broker {
 	private static final String SERVER_IP = "localhost";
 	private static final int SERVER_PORT = 5000;
@@ -24,6 +26,9 @@ public class Broker {
 			System.out.print("> ");
 			String command = keyboard.readLine();
 			
+			if (Messages.validFormat(command)) {
+
+			}
 			out.println(command);
 
 			if (command.equals("exit")) {
