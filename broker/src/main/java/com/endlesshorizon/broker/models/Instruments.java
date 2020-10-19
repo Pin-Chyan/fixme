@@ -3,7 +3,7 @@ package com.endlesshorizon.broker.models;
 import lombok.Getter;
 import lombok.Setter;
 
-public class Instrument {
+public class Instruments {
 	private @Getter @Setter String type;
 	private @Getter @Setter String instrument;
 	private @Getter @Setter float price;
