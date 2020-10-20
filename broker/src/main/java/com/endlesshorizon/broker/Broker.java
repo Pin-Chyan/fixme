@@ -48,10 +48,12 @@ public class Broker {
 	}
 	
 	private static void getBrokerID(String response) {
-		final Pattern p = Pattern.compile( "(\\d{6})" );
-		final Matcher m = p.matcher(response);
-		if ( m.find() ) {
-		  UID = m.group( 0 );
+		if (response.contains("UID:")) {
+			final Pattern p = Pattern.compile( "(\\d{6})" );
+			final Matcher m = p.matcher(response);
+			if ( m.find() ) {
+			  UID = m.group( 0 );
+			}
 		}
 	}
 }
