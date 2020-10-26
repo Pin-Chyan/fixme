@@ -39,8 +39,8 @@ public class Constructor {
 		String[] orders = null;
 
 		orders = text.split("\\s+");
-		marketName = orders[0];
-		instrumentName = orders[1];
+		marketName = orders[0].toLowerCase();
+		instrumentName = orders[1].toLowerCase();
 		price = Float.parseFloat(orders[2]);
 		quantity = Integer.parseInt(orders[3]);
 	}
@@ -55,12 +55,19 @@ public class Constructor {
 
 	// display by the map inside values
 	public static void displaySpec(Map<String, Instrument> map, String marketName) {
+
+		System.out.println("----------------------");
+		System.out.println("Constructor by Map");
+
 		// market name still needs to be discussed how it is used
 		System.out.println("Market Name: " + marketName);
 
 		// to access map values inside you need to make use of the same instrument object then assign the map indicated searched one.
 		Instrument item = map.get(marketName);
 		System.out.println(item.toString());
+
+		System.out.println("----------------------");
+		
 	}
 
 
@@ -69,10 +76,9 @@ public class Constructor {
 		String text = "Endrizon Stocks 12.3 8";
 
 		newMarket(map, text);
-		System.out.println("----------------------");
-		System.out.println("Constructor by Map");
+
 		displaySpec(map, marketName);
-		System.out.println("----------------------");
+
 
 		//Instrument hatDisplay = map.get("Endrizon");
 		//System.out.println(hatDisplay.toString());
