@@ -11,6 +11,7 @@ public class BrokerThread implements Runnable {
 	private Socket brokerClient;
 	private BufferedReader in;
 	private PrintWriter out;
+	private Boolean checkSum = false;
 
 	// interacts with the Socket connected user in its own thread/runnable to do his work alone
 	public BrokerThread(Socket clientSocket) throws IOException {
@@ -41,8 +42,20 @@ public class BrokerThread implements Runnable {
 					String request = in.readLine();
 
 					//once an input is received print it out to the client aswell as to the server console
+					if (checkSum == false) {
+						checkSum = true;
+						if (requestLine(request)) {
+							this.out.println(Prefixes.FM_BS + "recieved this message: " + request);
+						 	System.out.println(Prefixes.FM_BCS + UID + Prefixes.ANSI_WHITE +"] message: " + request);
+							 System.out.println("CheckSum is a match");
+							} else {
+								System.out.println("CheckSum is not a match");
+							}
+						}
 					this.out.println(Prefixes.FM_BS + "recieved this message: " + request);
 					System.out.println(Prefixes.FM_BCS + UID + Prefixes.ANSI_WHITE +"] message: " + request);
+					
+					this.out.println(Prefixes.FM_BS + "recieved this message: " + request);
 				} else {
 					this.out.println(Prefixes.FM_BS + "you are not authorized");
 					System.out.println(Prefixes.FM_BCS + UID + Prefixes.ANSI_WHITE +"] unauthorized connection");
@@ -69,5 +82,35 @@ public class BrokerThread implements Runnable {
 		}
 	}
 
+	
+	public static int genCheckSum(String message){
+        int genCheckSum = 1;
+        for (int i = 0; i < message.length(); i++){
+            int temp = (int) (Math.floor(Math.log(message.charAt(i)) / Math.log(2))) + 1;
+            genCheckSum += ((1 << temp) - 1) ^ message.charAt(i);
+        }
+        return genCheckSum;
+	}
+	
+	private static Boolean requestLine(String req) {
+		String[] orders = null;
+		String command;
+		int checkSum;
+		int checkSum_temp;
+
+		orders = req.split("\\s+");
+		command = orders[0] + " " + orders[1] + " " + orders[2] + " " + orders[3] + " " + orders[4] + " " + orders[5];
+		checkSum = Integer.parseInt(orders[6]);
+		checkSum_temp = genCheckSum(command);
+		System.out.println(orders[6]);
+		System.out.println(checkSum_temp);
+		System.out.println("once");
+		if (checkSum == checkSum_temp) {
+			return true;
+		} else {
+			System.out.println("Command was corrupted due to none same checkSum.");
+			return false;	
+		}
+	}
 
 }

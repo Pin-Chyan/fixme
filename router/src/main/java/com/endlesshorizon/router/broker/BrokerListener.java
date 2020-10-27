@@ -65,12 +65,15 @@ public class BrokerListener {
 			return false;
 		}
 	}
+	
 	public static void addBrokerUID(String UID){
 		brokerUIDS.add(UID);
 	}
+
 	public static void removeBrokerUID(String UID){
 		brokerUIDS.remove(brokerUIDS.indexOf(UID));
 	}
+
 	public void start() throws IOException {
 		initiate();
 	}

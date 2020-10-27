@@ -16,7 +16,7 @@ public class Broker {
 	static String UID;
 	static int checkSum;
 
-	public static void main(String[] args) throws UnknownHostException, IOException {
+	public static void main(String[] args) throws UnknownHostException, IOException, InterruptedException {
 		Socket client = new Socket(SERVER_IP, SERVER_PORT);
 
 		BufferedReader input = new BufferedReader(new InputStreamReader(client.getInputStream()));
@@ -36,6 +36,7 @@ public class Broker {
 				if (Messages.validFormat(command, UID)) {
 					checkSum = genCheckSum(command);
 					out.println(command + " " + checkSum);
+					//Thread.sleep(5000);
 				}
 				out.println();
 	

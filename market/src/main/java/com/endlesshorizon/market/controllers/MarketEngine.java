@@ -13,18 +13,28 @@ import com.endlesshorizon.market.models.Instrument;
 
 public class MarketEngine {
 	private static List<String> clients = new ArrayList<String>();
+	private static String command;
 	private static String marketUID;
 	private static String type;
 	private static String instrumentName;
 	private static float price;
 	private static int quantity;
 
+	// used for validating if the message recieved from the router was not corrupted compared to the first initail checkSum given by broker
+	private static int checkSum;
+
 	public static void marketDecisions(Map<String, Instrument> map,String text) {
 		// recieve text from server/router which is the brokers command
 		if (textFilter(text)) {
-			
-			// buying or selling
-			transMode(map);
+			int checkSum_temp = genCheckSum(command);
+			System.out.println(checkSum_temp);
+			System.out.println(checkSum);
+			if (checkSum == checkSum_temp) {
+				// buying or selling
+				transMode(map);
+			} else {
+				System.out.println("Command was corrupted due to none same checkSum.");			
+			}
 		}
 		// once variables are assigned in
 		//dispText();
@@ -47,6 +57,9 @@ public class MarketEngine {
 			instrumentName = orders[3].toLowerCase();
 			price = Float.parseFloat(orders[4]);
 			quantity = Integer.parseInt(orders[5]);
+			checkSum = Integer.parseInt(orders[6]);
+			command = orders[0] + " " + orders[1] + " " + orders[2] + " " + orders[3] + " " + orders[4] + " " + orders[5];
+			System.out.println(command);
 			System.out.println("values assigned.");
 			return true;
 		}
@@ -59,11 +72,11 @@ public class MarketEngine {
 			case "buy":
 				if (requiredAmount(map)) {
 					purchaseStock(map);
-					System.out.println("Requirements met");
+					System.out.println("You Have Bought Stock");
 				}
 				break;
 			case "sell":
-					System.out.println("Broken");
+					System.out.println("Sell method need implementation.");
 				break;
 		}
 	}
@@ -125,10 +138,18 @@ public class MarketEngine {
 		
 	}
 
-	public static void mapFeedback(Map<String, Instrument> map) {
-		System.out.println();
-	}
+	//public static void mapFeedback(Map<String, Instrument> map) {
+	//	System.out.println();
+	//}
 
+	public static int genCheckSum(String message){
+        int genCheckSum = 1;
+        for (int i = 0; i < message.length(); i++){
+            int temp = (int) (Math.floor(Math.log(message.charAt(i)) / Math.log(2))) + 1;
+            genCheckSum += ((1 << temp) - 1) ^ message.charAt(i);
+        }
+        return genCheckSum;
+    }
 
 	public static void main(String[] args) {
 		// all the markets are created and put into the map
@@ -138,8 +159,10 @@ public class MarketEngine {
 		String text = "223344 stocks 12.3 8";
 
 		// creating a buy or sell order.
-		//String text_R = "Buy stocks 122.3 7";
 		String text_R = "422122 223344 Buy stocks 12.3 4";
+		// testing purposes need a checksum to check whether the string incoming is of match of the checkSum convertion
+		int checkSum = genCheckSum(text_R);
+		text_R = "422122 223344 Buy stocks 12.3 4" + " " + checkSum;
 
 		// creation of the market
 		Constructor.newMarket(map, text);
@@ -154,6 +177,6 @@ public class MarketEngine {
 		//check the amoung of clients are there
 		//for(int i=0;i<clients.size();i++){
 		//	System.out.println(clients.get(i));
-		//} 
+		//}
 	}
 }
