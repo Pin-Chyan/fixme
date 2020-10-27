@@ -54,33 +54,33 @@ public class Constructor {
 	//} 
 
 	// display by the map inside values
-	public static void displaySpec(Map<String, Instrument> map, String marketName) {
+	//public static void displaySpec(Map<String, Instrument> map, String marketName) {
 
-		System.out.println("----------------------");
-		System.out.println("Constructor by Map");
+	//	System.out.println("----------------------");
+	//	System.out.println("Constructor by Map");
 
-		// market name still needs to be discussed how it is used
-		System.out.println("Market Name: " + marketName);
+	//	// market name still needs to be discussed how it is used
+	//	System.out.println("Market Name: " + marketName);
 
-		// to access map values inside you need to make use of the same instrument object then assign the map indicated searched one.
-		Instrument item = map.get(marketName);
-		System.out.println(item.toString());
+	//	// to access map values inside you need to make use of the same instrument object then assign the map indicated searched one.
+	//	Instrument item = map.get(marketName);
+	//	System.out.println(item.toString());
 
-		System.out.println("----------------------");
-		
-	}
+	//	System.out.println("----------------------");
 
-
-	public static void main(String[] args) {
-		Map<String, Instrument> map = new LinkedHashMap<>();
-		String text = "Endrizon Stocks 12.3 8";
-
-		newMarket(map, text);
-
-		displaySpec(map, marketName);
+	//}
 
 
-		//Instrument hatDisplay = map.get("Endrizon");
-		//System.out.println(hatDisplay.toString());
-	}
+	//public static void main(String[] args) {
+	//	Map<String, Instrument> map = new LinkedHashMap<>();
+	//	String text = "Endrizon Stocks 12.3 8";
+
+	//	newMarket(map, text);
+
+	//	//displaySpec(map, marketName);
+
+
+	//	//Instrument hatDisplay = map.get("Endrizon");
+	//	//System.out.println(hatDisplay.toString());
+	//}
 }

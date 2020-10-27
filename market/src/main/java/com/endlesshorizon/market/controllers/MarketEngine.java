@@ -47,6 +47,7 @@ public class MarketEngine {
 		switch (type) {
 			case "buy":
 				if (requiredAmount(map)) {
+					purchaseStock(map);
 					System.out.println("Requirements met");
 				}
 				break;
@@ -54,7 +55,6 @@ public class MarketEngine {
 					System.out.println("Broken");
 				break;
 		}
-
 	}
 	
 	private static Boolean requiredAmount(Map<String, Instrument> map) {
@@ -76,6 +76,18 @@ public class MarketEngine {
 		return true;
 	}
 
+	private static void purchaseStock(Map<String, Instrument> map) {
+		Instrument item = map.get(marketName);
+		float subTotal;
+
+		item.subStock(quantity);
+		subTotal = price - item.getPrice();
+		if (subTotal >= 0) {
+			System.out.println("You Paid Extra: " + subTotal);
+		}
+		map.put(marketName, item);
+	}
+
 	// testing if variables were sett in
 	//private static void dispText() {
 	//	System.out.println("Market Name: " + marketName);
@@ -85,6 +97,28 @@ public class MarketEngine {
 	//	System.out.println("Quantity" + quantity);
 	//}
 
+	// display map values
+	public static void displaySpec(Map<String, Instrument> map, String marketName) {
+
+		System.out.println("----------------------");
+		System.out.println("Constructor by Map");
+
+		// market name still needs to be discussed how it is used
+		System.out.println("Market Name: " + marketName);
+
+		// to access map values inside you need to make use of the same instrument object then assign the map indicated searched one.
+		Instrument item = map.get(marketName);
+		System.out.println(item.toString());
+
+		System.out.println("----------------------");
+		
+	}
+
+	public static void mapFeedback(Map<String, Instrument> map) {
+		System.out.println();
+	}
+
+
 	public static void main(String[] args) {
 		// all the markets are created and put into the map
 		Map<String, Instrument> map = new LinkedHashMap<>();
@@ -93,10 +127,13 @@ public class MarketEngine {
 		String text = "Endrizon stocks 12.3 8";
 
 		// creating a buy or sell order.
-		String text_R = "Buy stocks 12.3 8";
+		String text_R = "Buy stocks 122.3 7";
 
 		Constructor.newMarket(map, text);
+		marketName = "endrizon"; // temp to use displaySpec
+		displaySpec(map, marketName);
 		marketDecisions(map, text_R);
-		Constructor.displaySpec(map, marketName);
+		//Constructor.displaySpec(map, marketName);
+		displaySpec(map, marketName);
 	}
 }

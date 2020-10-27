@@ -14,6 +14,7 @@ public class Broker {
 	private static final int SERVER_PORT = 5000;
 	static Boolean connected = false;
 	static String UID;
+	static int checkSum;
 
 	public static void main(String[] args) throws UnknownHostException, IOException {
 		Socket client = new Socket(SERVER_IP, SERVER_PORT);
@@ -32,8 +33,9 @@ public class Broker {
 				System.out.print(Prefixes.FM_BCON + "UID:" + UID +"_>");
 				String command = keyboard.readLine();
 	
-				if (Messages.validFormat(command)) {
-					out.println(command);
+				if (Messages.validFormat(command, UID)) {
+					checkSum = genCheckSum(command);
+					out.println(command + " " + checkSum);
 				}
 				out.println();
 	
@@ -56,4 +58,13 @@ public class Broker {
 			}
 		}
 	}
+
+	public static int genCheckSum(String message){
+        int genCheckSum = 1;
+        for (int i = 0; i < message.length(); i++){
+            int temp = (int) (Math.floor(Math.log(message.charAt(i)) / Math.log(2))) + 1;
+            genCheckSum += ((1 << temp) - 1) ^ message.charAt(i);
+        }
+        return genCheckSum;
+    }
 }
