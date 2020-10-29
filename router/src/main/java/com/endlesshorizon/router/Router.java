@@ -25,6 +25,7 @@ public class Router {
 	private static Set<Map<String, PrintWriter>> marketWriters = new HashSet<>();
 
 	private static int Broker_port = 5000;
+	private static int Market_port = 5001;
 
 	public static void main(String[] arg) throws IOException, InterruptedException {
 		System.out.println(Prefixes.FM_S);
@@ -82,6 +83,21 @@ public class Router {
 				//once an input is received print it out to the client aswell as to the server console
 				this.out.println(Prefixes.FM_MS + "recieved this message: " + request);
 				System.out.println(Prefixes.FM_MCS + uid + Prefixes.ANSI_WHITE + "] message: " + request);
+			}
+		}
+	}
+
+	private static class MarketListener implements Runnable {
+		@Override
+		public void run() {
+			ExecutorService pool = Executors.newFixedThreadPool(4);
+			try (ServerSocket listener = new ServerSocket(Market_port)) {
+				while (true) {
+					pool.execute(new BrokerThread(listener.accept()));
+				}
+			} catch (IOException e) {}
+			catch (NoSuchElementException e) {
+				System.out.println("Disconnection Detected! on MarketListener");
 			}
 		}
 	}
