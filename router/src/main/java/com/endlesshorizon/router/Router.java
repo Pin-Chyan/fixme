@@ -27,13 +27,12 @@ public class Router {
 	private static int Broker_port = 5000;
 
 	public static void main(String[] arg) throws IOException, InterruptedException {
-			System.out.println(Prefixes.FM_S);
+		System.out.println(Prefixes.FM_S);
 
-			Thread brokers = new Thread(new BrokerListener());
-			broker.start();
-			
-			marketThread.start();
-		}
+		//create the listeners on each port for the markets and brokers
+		Thread brokers = new Thread(new BrokerListener());
+		brokers.start();
+
 	}
 
 	private static class BrokerListener implements Runnable {
