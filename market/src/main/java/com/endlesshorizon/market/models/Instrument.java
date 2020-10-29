@@ -8,6 +8,12 @@ public class Instrument implements Instruments {
 	private float price;
 	private int quantity;
 
+	public Instrument(String instrument, float price, int quantity) {
+		setName(instrument);
+		setPrice(price);
+		setQuantity(quantity);
+	}
+
 	@Override
 	public void addStock(int stock) {
 		quantity += stock;
@@ -51,13 +57,12 @@ public class Instrument implements Instruments {
         return String.format("Instrument Name: " + name + "\nPrice: " + price + "\nQuantity: " + quantity); 
     } 
 
-	public static void main(String[] args) {
-		Instrument hat = new Instrument();
-		hat.setPrice(Float.parseFloat("12.8"));
-		hat.setQuantity(20);
-		hat.addStock(8);
-		hat.subStock(10);
-		System.out.println(hat.toString());
-	}
+	// test purposes.
+	//public static void main(String[] args) {
+	//	float price = Float.parseFloat("12.8");
+	//	int quantity = 20;
+	//	Instrument item = new Instrument("eggs", price, quantity);
+	//	System.out.println(item.toString());
+	//}
 
 }

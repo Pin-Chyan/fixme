@@ -1,6 +1,6 @@
 package com.endlesshorizon.broker.valids;
 
-import java.util.Arrays;
+//import java.util.Arrays;
 
 import com.endlesshorizon.broker.utils.Prefixes;
 
@@ -64,20 +64,21 @@ public class Messages {
 
 	////Test Purposes
 	//public static void main(String[] args) {
+	//	String UID = "123456";
 	//	String command = "Buy world 12.3 3 223344";
 	//	if (validFormat(command)) {
-	//		//genCheckSum(command);
-	//		//System.out.println(genCheckSum(command));
+	//		System.out.println(UID + command);
+	//		System.out.println(genCheckSum(UID + command));
 	//		System.out.println("worked");
 	//	}
 	//}
 
-	//public static int genCheckSum(String message){
-    //    int genCheckSum = 1;
-    //    for (int i = 0; i < message.length(); i++){
-    //        int temp = (int) (Math.floor(Math.log(message.charAt(i)) / Math.log(2))) + 1;
-    //        genCheckSum += ((1 << temp) - 1) ^ message.charAt(i);
-    //    }
-    //    return genCheckSum;
-    //}
+	public static int genCheckSum(String message){
+        int genCheckSum = 1;
+        for (int i = 0; i < message.length(); i++){
+            int temp = (int) (Math.floor(Math.log(message.charAt(i)) / Math.log(2))) + 1;
+            genCheckSum += ((1 << temp) - 1) ^ message.charAt(i);
+        }
+        return genCheckSum;
+    }
 }

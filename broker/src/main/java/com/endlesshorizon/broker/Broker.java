@@ -35,7 +35,7 @@ public class Broker {
 				String command = keyboard.readLine();
 	
 				if (Messages.validFormat(command)) {
-					checkSum = genCheckSum(command);
+					checkSum = genCheckSum(UID + " " + command);
 					out.println(UID + " " + command + " " + checkSum);
 					//Thread.sleep(5000);
 				}
