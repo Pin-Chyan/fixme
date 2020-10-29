@@ -241,5 +241,6 @@ public class MarketEngine {
 		marketDecisions(map, text_R);
 		//Constructor.displaySpec(map, marketUID);
 		displaySpec(map, marketUID);
+		System.out.println(checkSum_Re);
 	}
 }

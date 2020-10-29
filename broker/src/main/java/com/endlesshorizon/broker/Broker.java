@@ -3,6 +3,7 @@ package com.endlesshorizon.broker;
 import java.io.*;
 import java.net.Socket;
 import java.net.UnknownHostException;
+import java.rmi.server.UID;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -33,9 +34,9 @@ public class Broker {
 				System.out.print(Prefixes.FM_BCON + "UID:" + UID +"_>");
 				String command = keyboard.readLine();
 	
-				if (Messages.validFormat(command, UID)) {
+				if (Messages.validFormat(command)) {
 					checkSum = genCheckSum(command);
-					out.println(command + " " + checkSum);
+					out.println(UID + " " + command + " " + checkSum);
 					//Thread.sleep(5000);
 				}
 				out.println();
