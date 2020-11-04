@@ -16,8 +16,6 @@ import java.util.NoSuchElementException;
 import java.util.Scanner;
 
 import com.endlesshorizon.router.utils.*;
-//import com.endlesshorizon.router.broker.*;
-//import com.endlesshorizon.router.market.*;
 
 public class Router {
 	// for each connected clients store their ID and their printwriter to write to their displays
