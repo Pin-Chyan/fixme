@@ -1,1 +1,31 @@
-BrokerUID 223344 buy stock 12.8 8
+Sending Messages
+
+Broker:
+	type instrument price amount market_UID
+
+Market:
+	we generate own products for every market created
+		market_UID:
+		intstrument price amount
+		intstrument price amount
+		intstrument price amount			arrayof Objects?
+
+		await for orders
+
+
+
+-------------------------
+
+Recieving Messages:
+
+Router:
+	Broker_UID type instrument price amount market_UID checksum
+
+Market:
+	market_UID
+	Constructor:
+		instrument price amount
+	
+	new constructor(instrument, price, amount);
+
+	
