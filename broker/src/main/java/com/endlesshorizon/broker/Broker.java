@@ -33,16 +33,17 @@ public class Broker {
 				PrintWriter out = new PrintWriter(client.getOutputStream(), true);
 				System.out.print(Prefixes.FM_BCON + "UID:" + UID +"_>");
 				String command = keyboard.readLine();
-	
+		
+				if (command.equals("exit")) {
+					break;
+				}
+
 				if (Messages.validFormat(command)) {
 					checkSum = genCheckSum(UID + " " + command);
 					out.println(UID + " " + command + " " + checkSum);
 					//Thread.sleep(5000);
-				}
-				out.println();
-	
-				if (command.equals("exit")) {
-					break;
+				} else {
+					out.println();
 				}
 			}
 		}

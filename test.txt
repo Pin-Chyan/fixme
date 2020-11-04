@@ -26,6 +26,8 @@ Market:
 	Constructor:
 		instrument price amount
 	
-	new constructor(instrument, price, amount);
+
+encoders and decoders
+
 
 	

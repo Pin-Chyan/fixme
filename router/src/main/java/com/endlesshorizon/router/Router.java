@@ -16,6 +16,7 @@ import java.util.NoSuchElementException;
 import java.util.Scanner;
 
 import com.endlesshorizon.router.utils.*;
+import com.endlesshorizon.router.valids.FixMessage;
 
 public class Router {
 	// for each connected clients store their ID and their printwriter to write to their displays
@@ -81,7 +82,14 @@ public class Router {
 			while (true) {
 				String request = in.nextLine();
 
-				//once an input is received print it out to the client aswell as to the server console
+				if (!(request.isEmpty())) {
+					FixMessage fix = new FixMessage(request);
+					int checksum_temp = genCheckSum(fix.getCommand());
+					if (fix.getChecksum() == checksum_temp) {
+						System.out.println("send command/request to market");
+					}
+					System.out.println(fix.getChecksum() + " || " + checksum_temp);
+				}
 				this.out.println(Prefixes.FM_BS + "recieved this message: " + request);
 				System.out.println(Prefixes.FM_BCS + uid + Prefixes.ANSI_WHITE + "] message: " + request);
 			}
@@ -130,12 +138,20 @@ public class Router {
 			marketWriters.add(market);
 			while(true) {
 				String request = in.nextLine();
-			
+
 				//once an input is received print it out to the client aswell as to the server console
 				this.out.println(Prefixes.FM_MS + "recieved this message: " + request);
 				System.out.println(Prefixes.FM_MCS + uid + Prefixes.ANSI_WHITE + "] message: " + request);
 			}
-
 		}
 	}
+
+	private static int genCheckSum(String message){
+        int genCheckSum = 1;
+        for (int i = 0; i < message.length(); i++){
+            int temp = (int) (Math.floor(Math.log(message.charAt(i)) / Math.log(2))) + 1;
+            genCheckSum += ((1 << temp) - 1) ^ message.charAt(i);
+        }
+        return genCheckSum;
+    }
 }
