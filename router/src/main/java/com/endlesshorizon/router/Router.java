@@ -34,6 +34,9 @@ public class Router {
 		Thread brokers = new Thread(new BrokerListener());
 		brokers.start();
 
+		Thread market = new Thread(new MarketListener());
+		market.start();
+
 	}
 
 	private static class BrokerListener implements Runnable {
@@ -68,12 +71,12 @@ public class Router {
 				out = new PrintWriter(socket.getOutputStream(), true);
 				uid = RouterUtils.generateID();
 			} catch (IOException e) {
-				System.err.println(Prefixes.FM_MS_Error + "IO exception in BrokerThread");
-				System.out.print(Prefixes.FM_MS_Error + e);
-				System.err.println(Prefixes.FM_MS_Error + e.getStackTrace());
+				System.err.println(Prefixes.FM_BS_Error + "IO exception in BrokerThread");
+				System.out.print(Prefixes.FM_BS_Error + e);
+				System.err.println(Prefixes.FM_BS_Error + e.getStackTrace());
 			}
-			out.println(Prefixes.FM_MS + "This is your UID: " + uid);
-			System.out.println(Prefixes.FM_MC + "joined: " + uid);
+			out.println(Prefixes.FM_BS + "This is your UID: " + uid);
+			System.out.println(Prefixes.FM_BC + "joined: " + uid);
 			Map<String, PrintWriter> broker = new HashMap<String, PrintWriter>();
 			broker.put(uid, out);
 			brokerWriters.add(broker);
@@ -81,8 +84,8 @@ public class Router {
 				String request = in.nextLine();
 
 				//once an input is received print it out to the client aswell as to the server console
-				this.out.println(Prefixes.FM_MS + "recieved this message: " + request);
-				System.out.println(Prefixes.FM_MCS + uid + Prefixes.ANSI_WHITE + "] message: " + request);
+				this.out.println(Prefixes.FM_BS + "recieved this message: " + request);
+				System.out.println(Prefixes.FM_BCS + uid + Prefixes.ANSI_WHITE + "] message: " + request);
 			}
 		}
 	}
@@ -93,12 +96,48 @@ public class Router {
 			ExecutorService pool = Executors.newFixedThreadPool(4);
 			try (ServerSocket listener = new ServerSocket(Market_port)) {
 				while (true) {
-					pool.execute(new BrokerThread(listener.accept()));
+					pool.execute(new MarketThread(listener.accept()));
 				}
 			} catch (IOException e) {}
 			catch (NoSuchElementException e) {
 				System.out.println("Disconnection Detected! on MarketListener");
 			}
+		}
+	}
+
+	private static class MarketThread implements Runnable {
+		private String uid;
+		private Socket socket;
+		private Scanner in;
+		private PrintWriter out;
+
+		public MarketThread(Socket socket) throws NullPointerException {
+			this.socket = socket;
+		}
+
+		@Override public void run() throws NullPointerException {
+			try {
+				in = new Scanner(socket.getInputStream());
+				out = new PrintWriter(socket.getOutputStream(), true);
+				uid = RouterUtils.generateID();
+			} catch (IOException e) {
+				System.err.println(Prefixes.FM_MS_Error + "IO exception in MarketThread");
+				System.out.print(Prefixes.FM_MS_Error + e);
+				System.err.println(Prefixes.FM_MS_Error + e.getStackTrace());
+			}
+			out.println(Prefixes.FM_MS + "This is your UID: " + uid);
+			System.out.println(Prefixes.FM_MC + "joined: " + uid);
+			Map<String, PrintWriter> market = new HashMap<String, PrintWriter>();
+			market.put(uid, out);
+			marketWriters.add(market);
+			while(true) {
+				String request = in.nextLine();
+			
+				//once an input is received print it out to the client aswell as to the server console
+				this.out.println(Prefixes.FM_MS + "recieved this message: " + request);
+				System.out.println(Prefixes.FM_MCS + uid + Prefixes.ANSI_WHITE + "] message: " + request);
+			}
+
 		}
 	}
 }
