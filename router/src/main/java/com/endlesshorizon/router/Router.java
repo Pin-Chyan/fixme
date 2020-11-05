@@ -82,11 +82,25 @@ public class Router {
 			while (true) {
 				String request = in.nextLine();
 
+				// filter out empty requests out
 				if (!(request.isEmpty())) {
 					FixMessage fix = new FixMessage(request);
 					int checksum_temp = genCheckSum(fix.getCommand());
+					// after checksum validation send message to desired market
 					if (fix.getChecksum() == checksum_temp) {
 						System.out.println("send command/request to market");
+						for (Map<String, PrintWriter> m_Writer : marketWriters) {
+							System.out.println("found the Market Map");
+							for (String market_identity : m_Writer.keySet()) {
+								System.out.println("going through marketlist to find the specific market");
+								System.out.println(market_identity + " | " + fix.getMarketUID());
+								if (fix.getMarketUID().contains(market_identity)) {
+									System.out.println("found the market");
+									PrintWriter writer = m_Writer.get(market_identity);
+									writer.print("hi you got a message from broker->router-> " + request);
+								}
+							}
+						}
 					}
 					System.out.println(fix.getChecksum() + " || " + checksum_temp);
 				}

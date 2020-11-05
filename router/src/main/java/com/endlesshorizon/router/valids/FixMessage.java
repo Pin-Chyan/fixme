@@ -41,4 +41,8 @@ public class FixMessage {
 	public int getChecksum() {
 		return checksum;
 	}
+
+	public String getMarketUID() {
+		return market_uid;
+	}
 }
