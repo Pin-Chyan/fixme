@@ -97,7 +97,9 @@ public class Router {
 								if (fix.getMarketUID().contains(market_identity)) {
 									System.out.println("found the market");
 									PrintWriter writer = m_Writer.get(market_identity);
-									writer.print("hi you got a message from broker->router-> " + request);
+									System.out.println("Sending Request.");
+									writer.print(request+"\n");
+									writer.flush();
 								}
 							}
 						}

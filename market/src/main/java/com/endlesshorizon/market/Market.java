@@ -10,6 +10,8 @@ import com.endlesshorizon.market.models.Instrument;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.regex.Matcher;
+import java.util.Scanner;
+import java.util.NoSuchElementException;
 
 public class Market {
 	private static final String SERVER_IP = "localhost";
@@ -20,18 +22,34 @@ public class Market {
 
     public static void main(String[] args) throws UnknownHostException, IOException {
 		Socket client = new Socket(SERVER_IP, SERVER_PORT);
-		
+		String serverResponse = "";
+
+		Scanner input = new Scanner(client.getInputStream());
+
+		// keyboard inputs which are getting read in
+		BufferedReader keyboard = new BufferedReader(new InputStreamReader(System.in));
+
 		while (true) {
-			String serverResponse = input.readLine();
-			System.out.println(serverResponse);
-			if (client.isConnected()) {
+			try {
+				serverResponse = input.nextLine();
+				System.out.println(serverResponse);
+				
+			} catch (NoSuchElementException e) {
+				System.out.println("Nothing");
+				try {
+					serverResponse = input.nextLine();
+					System.out.println(serverResponse);
+				} catch (NoSuchElementException d) {
+					System.out.println("Scanner Closed");
+				}
+				input.close();
+				return;
+			}
+			if (client.isConnected() && !serverResponse.isEmpty()) {
 				getMarketID(serverResponse);
-				System.out.print("> ");
+				PrintWriter out = new PrintWriter(client.getOutputStream(), true);
 			}
 		}
-
-		client.close();
-		System.exit(0);
 	}
 
 	private static void getMarketID(String response) {

@@ -10,6 +10,8 @@ import java.util.regex.Pattern;
 import com.endlesshorizon.broker.utils.Prefixes;
 import com.endlesshorizon.broker.valids.Messages;
 
+import lombok.val;
+
 public class Broker {
 	private static final String SERVER_IP = "localhost";
 	private static final int SERVER_PORT = 5000;
@@ -19,6 +21,8 @@ public class Broker {
 
 	public static void main(String[] args) throws UnknownHostException, IOException, InterruptedException {
 		Socket client = new Socket(SERVER_IP, SERVER_PORT);
+		boolean validated = true;
+		String serverResponse = "";
 
 		BufferedReader input = new BufferedReader(new InputStreamReader(client.getInputStream()));
 
@@ -26,8 +30,10 @@ public class Broker {
 		BufferedReader keyboard = new BufferedReader(new InputStreamReader(System.in));
 		
 		while (true) {
-			String serverResponse = input.readLine();
-			System.out.println(serverResponse);
+			if (validated){
+				serverResponse = input.readLine();
+				System.out.println(serverResponse);
+			}
 			if (client.isConnected()) {
 				getBrokerID(serverResponse);
 				PrintWriter out = new PrintWriter(client.getOutputStream(), true);
@@ -39,11 +45,11 @@ public class Broker {
 				}
 
 				if (Messages.validFormat(command)) {
+					validated = true;
 					checkSum = genCheckSum(UID + " " + command);
 					out.println(UID + " " + command + " " + checkSum);
-					//Thread.sleep(5000);
 				} else {
-					out.println();
+					validated = false;
 				}
 			}
 		}
