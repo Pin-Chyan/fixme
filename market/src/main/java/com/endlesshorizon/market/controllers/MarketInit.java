@@ -10,8 +10,13 @@ public class MarketInit {
 
     public static ArrayList<Instrument> instruments = new ArrayList<Instrument>();
 
-    public static void main(String[] args) throws Exception {
-        setUpMarket();
+    public static void main(String[] args) {
+        try {
+            setUpMarket();
+        } catch(Exception e) {
+            System.out.println(e.getMessage());
+            System.exit(0);
+        }
         for(int i = 0; i < instruments.size(); i++) {
             System.out.println(instruments.get(i).toString());
         }
