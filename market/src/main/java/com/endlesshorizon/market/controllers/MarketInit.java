@@ -17,10 +17,14 @@ public class MarketInit {
             System.out.println(e.getMessage());
             System.exit(0);
         }
-        for(int i = 0; i < instruments.size(); i++) {
+		displayInstrument();
+	}
+	
+	public static void displayInstrument() {
+		for(int i = 0; i < instruments.size(); i++) {
             System.out.println(instruments.get(i).toString());
         }
-    }
+	}
 
     public static void setUpMarket() throws Exception {
 		// open a file

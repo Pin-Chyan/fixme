@@ -1,5 +1,2 @@
 Iron
-Tin
-Coal
-Wheat
-Wood
+shoes
