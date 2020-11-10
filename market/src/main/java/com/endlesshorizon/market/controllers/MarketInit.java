@@ -12,7 +12,7 @@ public class MarketInit {
 
     public static void main(String[] args) {
         try {
-            setUpMarket();
+            MarketInit.setUpMarket();
         } catch(Exception e) {
             System.out.println(e.getMessage());
             System.exit(0);
@@ -40,8 +40,9 @@ public class MarketInit {
 			if (!"".equals(line)) {
 				// read file line by line, split it up (by ,) \\ nevermind
 				// create new instument(String instrument, float price, int quantity) from each line
-				float price = 1;
-				int quantity = 5;
+				float price = (float) Math.random() * 10;
+				price = ((float) Math.round(price*100))/100;
+				int quantity = (int) Math.ceil(Math.random() * 20);
 				Instrument instrument = new Instrument(line.trim(), price, quantity);
 				// add new instument to map
 				instruments.add(instrument);
