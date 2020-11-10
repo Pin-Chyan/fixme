@@ -17,6 +17,7 @@ import java.util.Scanner;
 
 import com.endlesshorizon.router.utils.*;
 import com.endlesshorizon.router.valids.FixMessage;
+import com.endlesshorizon.router.valids.MarkMessage;
 
 public class Router {
 	// for each connected clients store their ID and their printwriter to write to their displays
@@ -98,7 +99,7 @@ public class Router {
 									System.out.println("found the market");
 									PrintWriter writer = m_Writer.get(market_identity);
 									System.out.println("Sending Request.");
-									writer.print(request+"\n");
+									writer.print(request + "\n");
 									writer.flush();
 								}
 							}
@@ -155,9 +156,24 @@ public class Router {
 			while(true) {
 				String request = in.nextLine();
 
-				//once an input is received print it out to the client aswell as to the server console
-				this.out.println(Prefixes.FM_MS + "recieved this message: " + request);
-				System.out.println(Prefixes.FM_MCS + uid + Prefixes.ANSI_WHITE + "] message: " + request);
+				if (!(request.isEmpty())) {
+					MarkMessage mark = new MarkMessage(request);
+					for (Map<String, PrintWriter> b_Writer : brokerWriters) {
+						System.out.println("found the Broker Map");
+						for (String broker_identity : b_Writer.keySet()) {
+							System.out.println("going through marketlist to find specific broker");
+							System.out.println(broker_identity + " | " + mark.getBrokerUID());
+							if (mark.getBrokerUID().contains(broker_identity)) {
+								System.out.println("found broker");
+								PrintWriter writer = b_Writer.get(broker_identity);
+								System.out.println("Sending Request.");
+								writer.print(request + "\n");
+								writer.flush();
+							}
+						}
+					}
+				}
+
 			}
 		}
 	}
