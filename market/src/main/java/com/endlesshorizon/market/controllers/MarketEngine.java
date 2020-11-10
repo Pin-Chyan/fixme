@@ -59,7 +59,7 @@ public class MarketEngine {
 			case "buy":
 				buyMode();
 			case "sell":
-
+				sellMode();
 		}
 
 	}
@@ -70,7 +70,7 @@ public class MarketEngine {
 
 			// searches through the list of instrument to find the broker searching
 			// instrument
-			if (MarketInit.instruments.get(i).getName().contains(instrumentName)) {
+			if (MarketInit.instruments.get(i).getName().contains(instrumentName.toLowerCase())) {
 				// System.out.println(MarketInit.instruments.get(i).toString());
 
 				// checks whether the instrument which was found can actually do the required
@@ -102,7 +102,43 @@ public class MarketEngine {
 			return false;
 		}
 		if (!(item.getQuantity() >= quantity)) {
-			System.out.println("Your buying quanitity is more that the existing item quanitity: " + item.getQuantity());
+			System.out.println("Your buying quanitity is more that the existing item quantity: " + item.getQuantity());
+			result = false;
+			return false;
+		}
+		return true;
+	}
+
+	private static void sellMode() {
+		// System.out.println(instrumentName);
+		for (int i = 0; i < MarketInit.instruments.size(); i++) {
+
+			// searches through the list of instrument to find the broker searching
+			// instrument
+			if (MarketInit.instruments.get(i).getName().contains(instrumentName.toLowerCase())) {
+				// System.out.println(MarketInit.instruments.get(i).toString());
+
+				// checks whether the instrument which was found can actually do the required
+				// transaction
+				if (validSell(MarketInit.instruments.get(i))) {
+					MarketInit.instruments.get(i).addStock(quantity);
+
+					return;
+				}
+
+				// implemented due to validSell
+				if (result == false) {
+					return ;
+				}
+			}
+		}
+		
+		System.out.println("The product you were looking for does not exist or no longer exist anymore");
+	}
+
+	private static Boolean validSell(Instrument item) {
+		if (!(item.getPrice() >= price)) {
+			System.out.println("Your selling price is higher than the orginal buying price: " + item.getPrice());
 			result = false;
 			return false;
 		}
@@ -147,14 +183,14 @@ public class MarketEngine {
         }
         MarketInit.displayInstrument();
 		
-		String text = "123456 buy Iron 12.8 8 223344";
+		String text = "123456 sell Iron 12.2 8 223344";
 		int checkSum = genCheckSum(text);
 		String command = text + " " + checkSum;
 		
 		// incoming orders
 		marketDecisions(command);
         MarketInit.displayInstrument();
-		marketDecisions(command);
-        MarketInit.displayInstrument();
+		// marketDecisions(command);
+        // MarketInit.displayInstrument();
 	}
 }
