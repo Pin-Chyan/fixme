@@ -5,7 +5,8 @@ import java.net.Socket;
 import java.net.UnknownHostException;
 import java.util.regex.Pattern;
 
-import com.endlesshorizon.market.models.Instrument;
+import com.endlesshorizon.market.controllers.*;
+import com.endlesshorizon.market.models.*;
 
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -19,8 +20,9 @@ public class Market {
 	
 	public static Map<String, Instrument> map = new LinkedHashMap<>();
 	static String UID;
+	static Boolean setUp = false;
 
-    public static void main(String[] args) throws UnknownHostException, IOException {
+    public static void main(String[] args) throws UnknownHostException, IOException, InterruptedException {
 		Socket client = new Socket(SERVER_IP, SERVER_PORT);
 		String serverResponse = "";
 
@@ -33,6 +35,7 @@ public class Market {
 			try {
 				serverResponse = input.nextLine();
 				System.out.println(serverResponse);
+				//System.out.println("1");
 				
 			} catch (NoSuchElementException e) {
 				System.out.println("Nothing");
@@ -46,8 +49,19 @@ public class Market {
 				return;
 			}
 			if (client.isConnected() && !serverResponse.isEmpty()) {
-				getMarketID(serverResponse);
 				PrintWriter out = new PrintWriter(client.getOutputStream(), true);
+				if (setUp == false) {
+					MarketEngine.MarketEngineSetUp(UID, out);
+					getMarketID(serverResponse);
+					setUp = true;
+					serverResponse = "";
+				}
+				if (setUp == true && !serverResponse.isEmpty()) {
+					System.out.println(serverResponse);
+					Thread.sleep(5000);
+					MarketEngine.marketDecisions(serverResponse);
+				}
+				//System.out.println("2");
 			}
 		}
 	}

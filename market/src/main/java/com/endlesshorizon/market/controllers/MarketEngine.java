@@ -1,5 +1,6 @@
 package com.endlesshorizon.market.controllers;
 
+import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -8,6 +9,7 @@ import java.util.Map;
 import javax.naming.spi.DirStateFactory.Result;
 
 import com.endlesshorizon.market.models.Instrument;
+import com.endlesshorizon.market.utils.MarketUtils;
 
 // Market engine is for router use
 // handle trandsactions
@@ -18,25 +20,43 @@ import com.endlesshorizon.market.models.Instrument;
 public class MarketEngine {
 	// storing of broker information easier access
 	private static String clientUID;
-	private static String command;
 	private static String marketUID;
 	private static String type;
 	private static String instrumentName;
 	private static float price;
 	private static int quantity;
 
+	// used for checkSum
+	private static String command;
+	
+	// returning message back to the router containing brokerUID/clientUID and marketUID with the message which will be sent with
+	private static String reply;
+	
+	
 	// used for validating if the message recieved from the router was not corrupted compared to the first initail checkSum given by broker
 	private static int checkSum;
 	private static Boolean result = true;
 
-	public MarketEngine(String uid) {
+	// used for writing back to router
+	private static PrintWriter out;
+
+	public static void MarketEngineSetUp(String uid, PrintWriter writer) {
 		marketUID = uid;
+		out = writer;
+		try {
+            MarketInit.setUpMarket();
+        } catch(Exception e) {
+            System.out.println(e.getMessage());
+            System.exit(0);
+        }
+        MarketInit.displayInstrument();
 	}
 
 	public static void marketDecisions(String text) {
 		// do checksum first
 
-		marketUID = "223344";
+		// used for its main for testing
+		//marketUID = "223344";
 		if (textFilter(text)) {
 			int checkSum_temp = genCheckSum(command);
 			// System.out.println(checkSum_temp);
@@ -45,9 +65,10 @@ public class MarketEngine {
 				// buying or selling
 				transMode();
 			} else {
-				System.out.println("Command was corrupted due to none same checkSum.");
+				MarketUtils.printMessage("Command was corrupted due to not having same checkSum.", reply, out);
 			}
 		}
+        MarketInit.displayInstrument();
 	}
 
 	private static void transMode() {
@@ -88,17 +109,17 @@ public class MarketEngine {
 			}
 		}
 		
-		System.out.println("The product you were looking for does not exist or no longer exist anymore");
+		MarketUtils.printMessage("The product you were looking for does not exist or no longer exist anymore", reply, out);
 	}
 
 	private static Boolean validBuy(Instrument item) {
 		if (!(item.getPrice() <= price)) {
-			System.out.println("Your buying price is lower than the orginal selling price: " + item.getPrice());
+			MarketUtils.printMessage("Your buying price is lower than the orginal selling price: " + item.getPrice(), reply, out);
 			result = false;
 			return false;
 		}
 		if (!(item.getQuantity() >= quantity)) {
-			System.out.println("Your buying quanitity is more that the existing item quantity: " + item.getQuantity());
+			MarketUtils.printMessage("Your buying quanitity is more that the existing item quantity: " + item.getQuantity(), reply, out);
 			result = false;
 			return false;
 		}
@@ -129,13 +150,12 @@ public class MarketEngine {
 			}
 		}
 		
-		System.out.println("The product you were looking for does not exist or no longer exist anymore");
+		MarketUtils.printMessage("The product you were looking for does not exist or no longer exist anymore", reply, out);
 	}
 
 	private static Boolean validSell(Instrument item) {
 		if (!(item.getPrice() >= price)) {
-			System.out.println("Your selling price is higher than the orginal buying price: " + item.getPrice());
-			result = false;
+			MarketUtils.printMessage("Your selling price is higher than the orginal buying price: " + item.getPrice(), reply, out);
 			return false;
 		}
 		return true;
@@ -155,9 +175,10 @@ public class MarketEngine {
 			checkSum = Integer.parseInt(orders[6]);
 			command = orders[0] + " " + orders[1] + " " + orders[2] + " " + orders[3] + " " + orders[4] + " " + orders[5];
 			//System.out.println(command);
+			reply = clientUID + " " + marketUID + " ";
 			return true;
 		}
-		System.out.println("Broker Sent Market_UID Is Invalid.");
+		MarketUtils.printMessage("Broker Sent Market_UID Is Invalid.", reply, out);
 		return false;
 	}
 	
@@ -168,25 +189,25 @@ public class MarketEngine {
             genCheckSum += ((1 << temp) - 1) ^ message.charAt(i);
         }
         return genCheckSum;
-    }
-	
-	public static void main(String[] args) throws Exception {
-        try {
-            MarketInit.setUpMarket();
-        } catch(Exception e) {
-            System.out.println(e.getMessage());
-            System.exit(0);
-        }
-        MarketInit.displayInstrument();
-		
-		String text = "123456 sell Iron 12.2 8 223344";
-		int checkSum = genCheckSum(text);
-		String command = text + " " + checkSum;
-		
-		// incoming orders
-		marketDecisions(command);
-        MarketInit.displayInstrument();
-		// marketDecisions(command);
-        // MarketInit.displayInstrument();
 	}
+	
+	//public static void main(String[] args) throws Exception {
+    //    try {
+    //        MarketInit.setUpMarket();
+    //    } catch(Exception e) {
+    //        System.out.println(e.getMessage());
+    //        System.exit(0);
+    //    }
+    //    MarketInit.displayInstrument();
+		
+	//	String text = "123456 sell Iron 12.2 8 223344";
+	//	int checkSum = genCheckSum(text);
+	//	String command = text + " " + checkSum;
+		
+	//	// incoming orders testing purposes need to comment out PrintWriter
+	//	marketDecisions(command);
+    //    MarketInit.displayInstrument();
+	//	// marketDecisions(command);
+    //    // MarketInit.displayInstrument();
+	//}
 }
