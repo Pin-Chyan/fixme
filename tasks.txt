@@ -33,10 +33,16 @@ to be done
 
 ________________________
 
-1. MarketEngine needs to take in PrintWriter (so it can send messages to the router)
-2. MarketEngine needs to be used inside Market.java
-3. Check whether the messages are getting sent to the router
-4. if it does check if the router market passing back messages back to the original sender
+1. Fix issue with market.java.
+	i. to find issue
+		i. mvn clean package
+		ii. open server.bat
+		iii. open market.bat
+		iv. open broker.bat
+		v. buy a existing instrument.
+	ii. fix no line found.
+2. Check whether the messages are getting sent to the router
+3. if it does check if the router market passing back messages back to the original sender
 
 issues which may need to be resolved
 
