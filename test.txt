@@ -29,5 +29,17 @@ Market:
 
 encoders and decoders
 
+to be done
 
-	
+________________________
+
+1. MarketEngine needs to take in PrintWriter (so it can send messages to the router)
+2. MarketEngine needs to be used inside Market.java
+3. Check whether the messages are getting sent to the router
+4. if it does check if the router market passing back messages back to the original sender
+
+issues which may need to be resolved
+
+________________________
+
+1. once the message from the broker has been sent it need to listen from incoming messages back.

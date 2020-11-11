@@ -16,10 +16,6 @@ import com.endlesshorizon.market.models.Instrument;
 // Broker_UID type instrument price amount market_UID Checksum
 
 public class MarketEngine {
-	// used for storing bought instument quantity
-	private static List<String> clientsUID = new ArrayList<String>();
-	private static List<String> clientsListings = new ArrayList<String>();
-
 	// storing of broker information easier access
 	private static String clientUID;
 	private static String command;
