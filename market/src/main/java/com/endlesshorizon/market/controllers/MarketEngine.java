@@ -57,7 +57,27 @@ public class MarketEngine {
 
 		// used for its main for testing
 		//marketUID = "223344";
-		if (textFilter(text)) {
+		System.out.println(marketUID);
+		if (text.contains("list")) {
+			textFilter2(text);
+			String allInst = "";
+			for (int jj = 0; jj < MarketInit.instruments.size(); jj++) {
+
+				// searches through the list of instrument to find the broker searching
+				// instrument
+				allInst += "=";
+				allInst += MarketInit.instruments.get(jj).getName();
+				allInst += "-";
+				allInst += MarketInit.instruments.get(jj).getPrice();
+				allInst += "-";
+				allInst += MarketInit.instruments.get(jj).getQuantity();
+			}
+			if (allInst.length() > 1){
+				MarketUtils.printMessage(allInst.substring(1), reply, out);
+			} else {
+				MarketUtils.printMessage("none", reply, out);
+			}
+		} else if (textFilter(text)) {
 			int checkSum_temp = genCheckSum(command);
 			// System.out.println(checkSum_temp);
 			// System.out.println(checkSum);
@@ -72,13 +92,13 @@ public class MarketEngine {
 	}
 
 	private static void transMode() {
-		switch (type.toLowerCase()) {
-			case "buy":
-				buyMode();
-			case "sell":
-				sellMode();
+		if (type.toLowerCase().equals("buy")) {
+			buyMode();
+		} else if (type.toLowerCase().equals("sell")){
+			sellMode();
+		} else {
+			return;
 		}
-
 	}
 
 	private static void buyMode() {
@@ -94,7 +114,7 @@ public class MarketEngine {
 				// transaction
 				if (validBuy(MarketInit.instruments.get(i))) {
 					MarketInit.instruments.get(i).subStock(quantity);
-
+					MarketUtils.printMessage("Your purchase of "+quantity+"x"+instrumentName.toLowerCase()+" was a success. "+MarketInit.instruments.get(i).getQuantity()+"x"+instrumentName.toLowerCase()+" remaining.", reply, out);
 					// if no quantity of this product exist just remove it from db
 					if (MarketInit.instruments.get(i).getQuantity() == 0) {
 						MarketInit.instruments.remove(i);
@@ -109,16 +129,16 @@ public class MarketEngine {
 			}
 		}
 		
-		MarketUtils.printMessage("The product you were looking for does not exist or no longer exist anymore", reply, out);
+		MarketUtils.printMessage("The product you were looking for does not exist or no longer exists anymore", reply, out);
 	}
 
 	private static Boolean validBuy(Instrument item) {
-		if (!(item.getPrice() <= price)) {
+		if (price < item.getPrice()) {
 			MarketUtils.printMessage("Your buying price is lower than the orginal selling price: " + item.getPrice(), reply, out);
 			result = false;
 			return false;
 		}
-		if (!(item.getQuantity() >= quantity)) {
+		if (quantity > item.getQuantity()) {
 			MarketUtils.printMessage("Your buying quanitity is more that the existing item quantity: " + item.getQuantity(), reply, out);
 			result = false;
 			return false;
@@ -139,7 +159,7 @@ public class MarketEngine {
 				// transaction
 				if (validSell(MarketInit.instruments.get(i))) {
 					MarketInit.instruments.get(i).addStock(quantity);
-
+					MarketUtils.printMessage("You sold "+quantity+"x"+instrumentName.toLowerCase()+" to market["+marketUID+"] new quantity: "+MarketInit.instruments.get(i).getQuantity(), reply, out);
 					return;
 				}
 
@@ -154,7 +174,7 @@ public class MarketEngine {
 	}
 
 	private static Boolean validSell(Instrument item) {
-		if (!(item.getPrice() >= price)) {
+		if (price > item.getPrice()) {
 			MarketUtils.printMessage("Your selling price is higher than the orginal buying price: " + item.getPrice(), reply, out);
 			return false;
 		}
@@ -181,7 +201,18 @@ public class MarketEngine {
 		MarketUtils.printMessage("Broker Sent Market_UID Is Invalid.", reply, out);
 		return false;
 	}
-	
+	private static Boolean textFilter2(String text) {
+		String[] orders = null;
+
+		orders = text.split("\\s+");
+		if (marketUID.contains(orders[2])) {
+			clientUID = orders[0];
+			reply = clientUID + " " + marketUID + " ";
+			return true;
+		}
+		MarketUtils.printMessage("Broker Sent Market_UID Is Invalid.", reply, out);
+		return false;
+	}
 	public static int genCheckSum(String message){
 		int genCheckSum = 1;
         for (int i = 0; i < message.length(); i++){

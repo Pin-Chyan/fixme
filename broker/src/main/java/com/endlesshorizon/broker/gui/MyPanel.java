@@ -5,8 +5,16 @@ import java.awt.event.*;
 import javax.swing.*;
 import javax.swing.event.*;
 import java.util.ArrayList;
+import java.io.*;
+import java.net.Socket;
+import java.net.UnknownHostException;
+import java.rmi.server.UID;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class MyPanel extends JPanel {
+	private static final String SERVER_IP = "localhost";
+	private static final int SERVER_PORT = 5000;
 	public static JTextField guiTextArea;
 	public static JTextField guiTextField;
 	public static String AllText;
@@ -28,23 +36,48 @@ public class MyPanel extends JPanel {
     private static JLabel jcomp12;
     private static JLabel jcomp13;
 	private static JLabel jcomp14;
+	private static JLabel jcomp15;
+    private static JMenuItem jcomp16;
 	private static JMenu submenu;
+	private static JMenu toolMenu;
 
 	private static int Insamount;
 	private static int Insprice;
 	private static String Insname;
 	private static String Insmarket;
+
+	
+	static String UID = "";
+	static String[] Markets = null;
+	static BufferedReader input = null;
+	static PrintWriter out = null;
+
+
 	@SuppressWarnings("unchecked")
-	public MyPanel() {
+	public MyPanel() throws UnknownHostException, IOException, InterruptedException {
+
+
 		//construct preComponents
         String[] jcomp3Items = {};
-        JMenu toolMenu = new JMenu ("Tools");
+        toolMenu = new JMenu ("Tools");
 		submenu = new JMenu("Market List");
 
 		toolMenu.add(submenu);
-		marketList.add("NASDAQ");
-		marketList.add("SA Trades");
+		for (int jj = 0; jj < Markets.length; jj++) {
+			marketList.add(Markets[jj]);
+		}
 		createMarkets(marketList);
+
+		jcomp16 = new JMenuItem();
+		jcomp16.setText("Refresh");
+		jcomp16.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                refreshData();
+            }
+		});
+		toolMenu.add(jcomp16);
+
         //construct components
 		jcomp1 = new JButton ("Sell");
 		jcomp1.addActionListener(new ActionListener() {
@@ -82,6 +115,7 @@ public class MyPanel extends JPanel {
         jcomp12 = new JLabel ("Amount:");
         jcomp13 = new JLabel ("Value: N/A");
         jcomp14 = new JLabel ("Name: None");
+        jcomp15 = new JLabel ("Status: N/A");
 
         //adjust size and set layout
         setPreferredSize (new Dimension (944, 601));
@@ -102,6 +136,7 @@ public class MyPanel extends JPanel {
         add (jcomp12);
         add (jcomp13);
         add (jcomp14);
+        add (jcomp15);
 
         //set component bounds (only needed by Absolute Positioning)
         jcomp1.setBounds (730, 505, 75, 25);
@@ -117,45 +152,133 @@ public class MyPanel extends JPanel {
         jcomp11.setBounds (665, 395, 100, 25);
         jcomp12.setBounds (665, 365, 100, 25);
         jcomp13.setBounds (665, 325, 100, 25);
-        jcomp14.setBounds (665, 285, 120, 25);
+		jcomp14.setBounds (665, 285, 120, 25);
+		jcomp15.setBounds (500, 545, 400, 25);
 	}
 
-	public static void main(String[] args) {
-		JFrame frame = new JFrame("EndrisonZA Broker");
+	public static void main(String[] args) throws UnknownHostException, IOException, InterruptedException{
+		Socket client = new Socket(SERVER_IP, SERVER_PORT);
+		input = new BufferedReader(new InputStreamReader(client.getInputStream()));
+		out = new PrintWriter(client.getOutputStream(), true);
+		String serverResponse = input.readLine();
+		System.out.println(serverResponse);
+		if (serverResponse.contains("UID:")) {
+			final Pattern p = Pattern.compile( "(\\d{6})" );
+			final Matcher m = p.matcher(serverResponse);
+			if ( m.find() ) {
+			  UID = m.group( 0 );
+			}
+		}
+
+		int checkSum = genCheckSum(UID + " markets");
+		out.println(UID + " markets" + " " + checkSum);
+		String serverResponse2 = input.readLine();
+		String serverResponse3 = input.readLine();
+		System.out.println(serverResponse3);
+
+		Markets = null;
+		Markets = serverResponse3.split("=");
+
+
+		JFrame frame = new JFrame("EndrisonZA Broker "+UID);
 		frame.setDefaultCloseOperation (JFrame.EXIT_ON_CLOSE);
         frame.getContentPane().add (new MyPanel());
         frame.pack();
-        frame.setVisible (true);
+		frame.setVisible (true);
+		if (false){
+			client.close();
+		}
 	}
-
+	private static void refreshData(){
+		updateMList();
+		Insmarket = null;
+		jcomp8.setText("Click on tools to select a market");
+		jcomp14.setText("Name: N/A");
+		jcomp13.setText("Value: N/A");
+		Insname = null;
+		Object[] allins = {};
+		loadInstruments(allins);
+	}
 	private static void setIns(){
 		if (jcomp3.getSelectedValue() != null){
-			String[] values = jcomp3.getSelectedValue().toString().split("@",0); 
-			jcomp14.setText("Name: "+values[0]);
+			String[] values = jcomp3.getSelectedValue().toString().split("@",0);
+			String[] v2 = values[0].split("\\s+",0);
+			jcomp14.setText("Name: "+v2[1]);
 			jcomp13.setText("Value: "+values[1]);
 			String nem = values[0];
 			String[] nem2 = nem.split("\\s",0);
-			Insname = nem2[0];
+			Insname = v2[1];
 			// Insprice = Integer.parseInt(values[1].replaceAll("[^\\d.]", ""));
 		}
 	}
-	
+	private static void updateMList(){
+		int checkSum = genCheckSum(UID + " markets");
+		out.println(UID + " markets" + " " + checkSum);
+		String serverResponse3 = "";
+		try {
+			String serverResponse2 = input.readLine();
+			serverResponse3 = input.readLine();
+		} catch (IOException exc435){
+
+		}
+		System.out.println(serverResponse3);
+
+		Markets = null;
+		Markets = serverResponse3.split("=");
+
+		submenu.removeAll();
+		submenu.repaint();
+		marketList.clear();
+		for (int jj = 0; jj < Markets.length; jj++) {
+			System.out.println("mk-"+Markets[jj]);
+			marketList.add(Markets[jj]);
+		}
+		createMarkets(marketList);
+	}
+	public static int genCheckSum(String message){
+        int genCheckSum = 1;
+        for (int i = 0; i < message.length(); i++){
+            int temp = (int) (Math.floor(Math.log(message.charAt(i)) / Math.log(2))) + 1;
+            genCheckSum += ((1 << temp) - 1) ^ message.charAt(i);
+        }
+        return genCheckSum;
+    }
 	private static void SetMarket(String Name) {
+		updateMList();
 		Insmarket = Name;
 		jcomp8.setText(Name);
 		jcomp14.setText("Name: N/A");
 		jcomp13.setText("Value: N/A");
 		Insname = null;
-		if (Name.equals("NASDAQ")){
-			String[] jcomp3Items = {"Endrison Stock @ R100", "Apple Stock @ R200", "Samsung Stock @ R200"};
-			loadInstruments(jcomp3Items);
+		int checkSum = genCheckSum(UID + " list "+Name);
+		out.println(UID + " list " + Name + " " + checkSum);
+		String serverResponse3 = "";
+		try {
+			String serverResponse2 = input.readLine();
+			serverResponse3 = input.readLine();
+		} catch (IOException eex){
+
+		}
+		System.out.println(serverResponse3);
+
+		String[] inss = serverResponse3.substring(14).split("=");
+		if (serverResponse3.contains("none")){
+			System.out.println("none");
+			Object[] allins = {};
+			loadInstruments(allins);
 		} else {
-			String[] jcomp3Items = {"Endrison Stock @ R1000", "Apple Stock @ R2000", "Samsung Stock @ R2000"};
-			loadInstruments(jcomp3Items);
+			ArrayList<String> jcomp3Items = new ArrayList<String>();
+			for (int jj = 0; jj < inss.length; jj++) {
+				System.out.println(inss[jj]);
+				String[] inssV = inss[jj].split("-");
+				jcomp3Items.add(inssV[2] +"x "+ inssV[0]+" @ R"+inssV[1]);
+			}
+			Object[] allins = jcomp3Items.toArray();
+			loadInstruments(allins);
 		}
 	}
 	@SuppressWarnings("unchecked")
-	private static void loadInstruments(String[] Instruments) {
+	private static void loadInstruments(Object[] Instruments) {
 		jcomp3.setListData(Instruments);
 	}
 	private static void createMarkets(ArrayList<String> markets) {
@@ -180,6 +303,18 @@ public class MyPanel extends JPanel {
 				if (Insamount > 0){
 					if (Insprice > 0){
 						System.out.printf("%nInstrument Purchase (%s|%s|%d|%d)%n",Insmarket, Insname,Insamount,Insprice);
+						int checkSum = genCheckSum(UID + " buy "+Insname+" "+Insprice+" "+Insamount+" "+Insmarket);
+						out.println(UID + " buy "+Insname+" "+Insprice+" "+Insamount+" "+Insmarket +" "+ checkSum);
+						String serverResponse3 = "";
+						try {
+							String serverResponse2 = input.readLine();
+							serverResponse3 = input.readLine();
+						} catch (IOException exec23){
+
+						}
+						System.out.println(serverResponse3);
+						jcomp15.setText("Status: "+serverResponse3.substring(14));
+						SetMarket(Insmarket);
 					} else {
 						System.out.println("Price Can't Be Negative or 0.");
 					}
@@ -202,6 +337,18 @@ public class MyPanel extends JPanel {
 				if (Insamount > 0){
 					if (Insprice > 0){
 						System.out.printf("%nInstrument Sale (%s|%s|%d|%d)%n",Insmarket, Insname,Insamount,Insprice);
+						int checkSum = genCheckSum(UID + " sell "+Insname+" "+Insprice+" "+Insamount+" "+Insmarket);
+						out.println(UID + " sell "+Insname+" "+Insprice+" "+Insamount+" "+Insmarket +" "+ checkSum);
+						String serverResponse3 = "";
+						try {
+							String serverResponse2 = input.readLine();
+							serverResponse3 = input.readLine();
+						} catch (IOException exec23){
+
+						}
+						System.out.println(serverResponse3);
+						jcomp15.setText("Status: "+serverResponse3.substring(14));
+						SetMarket(Insmarket);
 					} else {
 						System.out.println("Price Can't Be Negative or 0.");
 					}

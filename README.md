@@ -15,3 +15,16 @@ java -jar ./router/target/fixme-router-1.0-SNAPSHOT.jar
 java -jar ./broker/target/fixme-broker-1.0-SNAPSHOT.jar
 #### To Run The Market (Requires you to build first):
 java -jar ./market/target/fixme-market-1.0-SNAPSHOT.jar
+
+## FixME Commands
+#### Broker Commands
+##### markets
+Provides a list of available markets
+##### list 123456
+Provides a list of instruments of a specified market
+##### buy instrument price quantity marketID
+Buys the specified instrument quantity at the specified price from the specified market
+buy shoes 4.32 3 123456
+##### sell instrument price quantity marketID
+Sells the specified instrument quantity at the specified price to the specified market
+sell shoes 1.5 3 123456

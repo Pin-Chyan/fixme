@@ -44,21 +44,23 @@ public class Market {
 					System.out.println(serverResponse);
 				} catch (NoSuchElementException d) {
 					System.out.println("Scanner Closed");
+					// String kbip1 = keyboard.readLine();
+					input.close();
+					return;
 				}
-				input.close();
-				return;
 			}
 			if (client.isConnected() && !serverResponse.isEmpty()) {
 				PrintWriter out = new PrintWriter(client.getOutputStream(), true);
 				if (setUp == false) {
-					MarketEngine.MarketEngineSetUp(UID, out);
+					System.out.println(UID);
 					getMarketID(serverResponse);
+					System.out.println(UID);
+					MarketEngine.MarketEngineSetUp(UID, out);
 					setUp = true;
 					serverResponse = "";
-				}
-				if (setUp == true && !serverResponse.isEmpty()) {
+				} else if (setUp == true && !serverResponse.isEmpty()) {
 					System.out.println(serverResponse);
-					Thread.sleep(5000);
+					// Thread.sleep(5000);
 					MarketEngine.marketDecisions(serverResponse);
 				}
 				//System.out.println("2");

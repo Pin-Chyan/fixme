@@ -21,7 +21,7 @@ import com.endlesshorizon.router.valids.MarkMessage;
 
 public class Router {
 	// for each connected clients store their ID and their printwriter to write to their displays
-	private static Set<Map<String, PrintWriter>> brokerWriters = new HashSet<>();
+	private static Set<Map<String, OutputStream>> brokerWriters = new HashSet<>();
 	private static Set<Map<String, PrintWriter>> marketWriters = new HashSet<>();
 
 	private static int Broker_port = 5000;
@@ -66,8 +66,10 @@ public class Router {
 		
 		@Override
 		public void run() {
+			OutputStream outStream = null;
 			try {
 				in = new Scanner(socket.getInputStream());
+				outStream = socket.getOutputStream();
 				out = new PrintWriter(socket.getOutputStream(), true);
 				uid = RouterUtils.generateID();
 			} catch (IOException e) {
@@ -77,37 +79,84 @@ public class Router {
 			}
 			out.println(Prefixes.FM_BS + "This is your UID: " + uid);
 			System.out.println(Prefixes.FM_BC + "joined: " + uid);
-			Map<String, PrintWriter> broker = new HashMap<String, PrintWriter>();
-			broker.put(uid, out);
+			Map<String, OutputStream> broker = new HashMap<String, OutputStream>();
+			broker.put(uid, outStream);
 			brokerWriters.add(broker);
 			while (true) {
-				String request = in.nextLine();
+				String request = "";
+				try {
+					request = in.nextLine();
+				} catch (NoSuchElementException exec32){
+					System.out.println("Broker["+uid+"] Disconnected");
+					return;
+				}
 
 				// filter out empty requests out
+				this.out.println(Prefixes.FM_BS + "recieved this message: " + request);
+				this.out.flush();
 				if (!(request.isEmpty())) {
-					FixMessage fix = new FixMessage(request);
-					int checksum_temp = genCheckSum(fix.getCommand());
-					// after checksum validation send message to desired market
-					if (fix.getChecksum() == checksum_temp) {
-						System.out.println("send command/request to market");
+					System.out.println("req["+request+"]");
+					if (!request.toLowerCase().contains("list") && !request.toLowerCase().contains("markets")){
+						FixMessage fix = new FixMessage(request);
+						int checksum_temp = genCheckSum(fix.getCommand());
+						// after checksum validation send message to desired market
+						if (fix.getChecksum() == checksum_temp) {
+							System.out.println("send command/request to market");
+							for (Map<String, PrintWriter> m_Writer : marketWriters) {
+								System.out.println("found the Market Map");
+								for (String market_identity : m_Writer.keySet()) {
+									System.out.println("going through marketlist to find the specific market");
+									System.out.println(market_identity + " | " + fix.getMarketUID());
+									if (fix.getMarketUID().contains(market_identity)) {
+										System.out.println("found the market");
+										PrintWriter writer = m_Writer.get(market_identity);
+										System.out.println("Sending Request.");
+										writer.print(request + "\n");
+										writer.flush();
+									}
+								}
+							}
+						}
+						System.out.println(fix.getChecksum() + " || " + checksum_temp);
+					} else if (request.toLowerCase().contains("markets")){
+						String allmarkets = "";
+						for (Map<String, PrintWriter> m_Writer : marketWriters) {
+							System.out.println("found the Market Map");
+							for (String market_identity : m_Writer.keySet()) {
+								System.out.println("getting all the markets");
+								allmarkets += "=";
+								allmarkets += market_identity;
+							}
+						}
+						if (allmarkets.length() > 1){
+							this.out.println(allmarkets.substring(1));
+							this.out.flush();
+						} else {
+							this.out.println("none");
+							this.out.flush();
+						}
+					} else {
+						String[] cmdss = null;
+
+						cmdss = request.split("\\s+");
+						System.out.println(request);
+						System.out.println("Getting list from market");
 						for (Map<String, PrintWriter> m_Writer : marketWriters) {
 							System.out.println("found the Market Map");
 							for (String market_identity : m_Writer.keySet()) {
 								System.out.println("going through marketlist to find the specific market");
-								System.out.println(market_identity + " | " + fix.getMarketUID());
-								if (fix.getMarketUID().contains(market_identity)) {
+								System.out.println(market_identity + " | " + cmdss[2]);
+								if (cmdss[2].contains(market_identity)) {
 									System.out.println("found the market");
 									PrintWriter writer = m_Writer.get(market_identity);
 									System.out.println("Sending Request.");
-									writer.print(request + "\n");
+									writer.println(request);
 									writer.flush();
 								}
 							}
 						}
 					}
-					System.out.println(fix.getChecksum() + " || " + checksum_temp);
 				}
-				this.out.println(Prefixes.FM_BS + "recieved this message: " + request);
 				System.out.println(Prefixes.FM_BCS + uid + Prefixes.ANSI_WHITE + "] message: " + request);
 			}
 		}
@@ -154,20 +203,38 @@ public class Router {
 			market.put(uid, out);
 			marketWriters.add(market);
 			while(true) {
-				String request = in.nextLine();
+				String request = "";
+				try {
+					request = in.nextLine();
+				} catch (NoSuchElementException exep) {
+					System.out.println("Market["+uid+"] Disconnected");
+					request = "";
+					System.out.println("Deleting marketUID");
+					for (Map<String, PrintWriter> m_Writer : marketWriters) {
+						for (String market_identity : m_Writer.keySet()) {
+							if (uid.contains(market_identity)) {
+								m_Writer.remove(market_identity);
+								System.out.println("Deleted");
+							}
+						}
+					}
+					return;
+				}
 
 				if (!(request.isEmpty())) {
 					MarkMessage mark = new MarkMessage(request);
-					for (Map<String, PrintWriter> b_Writer : brokerWriters) {
+					for (Map<String, OutputStream> b_Writer : brokerWriters) {
 						System.out.println("found the Broker Map");
 						for (String broker_identity : b_Writer.keySet()) {
 							System.out.println("going through marketlist to find specific broker");
 							System.out.println(broker_identity + " | " + mark.getBrokerUID());
 							if (mark.getBrokerUID().contains(broker_identity)) {
 								System.out.println("found broker");
-								PrintWriter writer = b_Writer.get(broker_identity);
+								System.out.println(b_Writer.get(broker_identity));
+								PrintWriter writer = new PrintWriter(b_Writer.get(broker_identity), true);
 								System.out.println("Sending Request.");
-								writer.print(request + "\n");
+								System.out.println("Request: "+request);
+								writer.println(request);
 								writer.flush();
 							}
 						}

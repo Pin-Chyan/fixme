@@ -11,6 +11,12 @@ public class Messages {
 		orders = command.split("\\s+");
         //System.out.println(Arrays.toString(orders));
 		//System.out.println(orders.length);
+		if (command.toLowerCase().equals("markets")){
+			return true;
+		}
+		if (orders[0].equals("list") && isSixDigit(orders[1]) && isNumber(orders[1])){
+			return true;
+		}
 		if (orders.length != 5) {
 			System.out.println(Prefixes.FM_INVALID_FORM + "Make Use Of This Structure: Type Instrument Price Quantity MarketID.");
 			return false;
