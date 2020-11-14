@@ -146,6 +146,9 @@ public class Broker {
 								} else if (newResponse.contains("Your buying quanitity is more")){
 									System.out.println(newResponse.substring(14));
 									completedAction = true;
+								} else if (newResponse.contains("The MarketUID you gave does not exist")){
+									System.out.println(newResponse.substring(14));
+									completedAction = true;
 								} else {
 									System.out.println("Unkown response: "+newResponse);
 									completedAction = true;

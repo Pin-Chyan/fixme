@@ -45,4 +45,8 @@ public class FixMessage {
 	public String getMarketUID() {
 		return market_uid;
 	}
+
+	public String getBrokerUID() {
+		return broker_uid;
+	}
 }

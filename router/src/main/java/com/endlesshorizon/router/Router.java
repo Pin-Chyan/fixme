@@ -59,6 +59,7 @@ public class Router {
 		private Socket socket;
 		private Scanner in;
 		private PrintWriter out;
+		private Boolean exist = false;
 		
 		public BrokerThread(Socket socket) {
 			this.socket = socket;
@@ -101,14 +102,15 @@ public class Router {
 						int checksum_temp = genCheckSum(fix.getCommand());
 						// after checksum validation send message to desired market
 						if (fix.getChecksum() == checksum_temp) {
-							System.out.println("send command/request to market");
+							//System.out.println("send command/request to market");
 							for (Map<String, PrintWriter> m_Writer : marketWriters) {
-								System.out.println("found the Market Map");
+								//System.out.println("found the Market Map");
 								for (String market_identity : m_Writer.keySet()) {
-									System.out.println("going through marketlist to find the specific market");
+									//System.out.println("going through marketlist to find the specific market");
 									System.out.println(market_identity + " | " + fix.getMarketUID());
 									if (fix.getMarketUID().contains(market_identity)) {
-										System.out.println("found the market");
+										exist = true;
+										//System.out.println("found the market");
 										PrintWriter writer = m_Writer.get(market_identity);
 										System.out.println("Sending Request.");
 										writer.print(request + "\n");
@@ -116,8 +118,12 @@ public class Router {
 									}
 								}
 							}
+							if (exist == false) {
+								out.println(fix.getBrokerUID() + " " + fix.getMarketUID() + " The MarketUID you gave does not exist");
+								out.flush();
+							}
 						}
-						System.out.println(fix.getChecksum() + " || " + checksum_temp);
+						//System.out.println(fix.getChecksum() + " || " + checksum_temp);
 					} else if (request.toLowerCase().contains("markets")){
 						String allmarkets = "";
 						for (Map<String, PrintWriter> m_Writer : marketWriters) {
@@ -139,15 +145,15 @@ public class Router {
 						String[] cmdss = null;
 
 						cmdss = request.split("\\s+");
-						System.out.println(request);
-						System.out.println("Getting list from market");
+						//System.out.println(request);
+						//System.out.println("Getting list from market");
 						for (Map<String, PrintWriter> m_Writer : marketWriters) {
-							System.out.println("found the Market Map");
+							//System.out.println("found the Market Map");
 							for (String market_identity : m_Writer.keySet()) {
-								System.out.println("going through marketlist to find the specific market");
+								//System.out.println("going through marketlist to find the specific market");
 								System.out.println(market_identity + " | " + cmdss[2]);
 								if (cmdss[2].contains(market_identity)) {
-									System.out.println("found the market");
+									//System.out.println("found the market");
 									PrintWriter writer = m_Writer.get(market_identity);
 									System.out.println("Sending Request.");
 									writer.println(request);
@@ -224,9 +230,9 @@ public class Router {
 				if (!(request.isEmpty())) {
 					MarkMessage mark = new MarkMessage(request);
 					for (Map<String, OutputStream> b_Writer : brokerWriters) {
-						System.out.println("found the Broker Map");
+						//System.out.println("found the Broker Map");
 						for (String broker_identity : b_Writer.keySet()) {
-							System.out.println("going through marketlist to find specific broker");
+							//System.out.println("going through marketlist to find specific broker");
 							System.out.println(broker_identity + " | " + mark.getBrokerUID());
 							if (mark.getBrokerUID().contains(broker_identity)) {
 								System.out.println("found broker");
