@@ -107,7 +107,7 @@ public class Router {
 								//System.out.println("found the Market Map");
 								for (String market_identity : m_Writer.keySet()) {
 									//System.out.println("going through marketlist to find the specific market");
-									System.out.println(market_identity + " | " + fix.getMarketUID());
+									//System.out.println(market_identity + " | " + fix.getMarketUID());
 									if (fix.getMarketUID().contains(market_identity)) {
 										exist = true;
 										//System.out.println("found the market");
@@ -127,7 +127,7 @@ public class Router {
 					} else if (request.toLowerCase().contains("markets")){
 						String allmarkets = "";
 						for (Map<String, PrintWriter> m_Writer : marketWriters) {
-							System.out.println("found the Market Map");
+							System.out.println("Found the Market Map");
 							for (String market_identity : m_Writer.keySet()) {
 								System.out.println("getting all the markets");
 								allmarkets += "=";
@@ -233,10 +233,10 @@ public class Router {
 						//System.out.println("found the Broker Map");
 						for (String broker_identity : b_Writer.keySet()) {
 							//System.out.println("going through marketlist to find specific broker");
-							System.out.println(broker_identity + " | " + mark.getBrokerUID());
+							//System.out.println(broker_identity + " | " + mark.getBrokerUID());
 							if (mark.getBrokerUID().contains(broker_identity)) {
-								System.out.println("found broker");
-								System.out.println(b_Writer.get(broker_identity));
+								//System.out.println("found broker");
+								//System.out.println(b_Writer.get(broker_identity));
 								PrintWriter writer = new PrintWriter(b_Writer.get(broker_identity), true);
 								System.out.println("Sending Request.");
 								System.out.println("Request: "+request);

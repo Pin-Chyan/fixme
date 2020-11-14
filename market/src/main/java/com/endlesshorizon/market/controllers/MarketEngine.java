@@ -57,7 +57,7 @@ public class MarketEngine {
 
 		// used for its main for testing
 		//marketUID = "223344";
-		System.out.println(marketUID);
+		//System.out.println(marketUID);
 		if (text.contains("list")) {
 			textFilter2(text);
 			String allInst = "";

@@ -52,9 +52,8 @@ public class Market {
 			if (client.isConnected() && !serverResponse.isEmpty()) {
 				PrintWriter out = new PrintWriter(client.getOutputStream(), true);
 				if (setUp == false) {
-					System.out.println(UID);
+					//System.out.println(UID);
 					getMarketID(serverResponse);
-					System.out.println(UID);
 					MarketEngine.MarketEngineSetUp(UID, out);
 					setUp = true;
 					serverResponse = "";
@@ -63,7 +62,6 @@ public class Market {
 					// Thread.sleep(5000);
 					MarketEngine.marketDecisions(serverResponse);
 				}
-				//System.out.println("2");
 			}
 		}
 	}

@@ -16,16 +16,12 @@ public class Instrument implements Instruments {
 
 	@Override
 	public void addStock(int stock) {
-		quantity += stock;
-		// TODO Auto-generated method stub
-		
+		quantity += stock;	
 	}
 	
 	@Override
 	public void subStock(int stock) {
 		quantity -= stock;
-		// TODO Auto-generated method stub
-		
 	}
 	
 	public void setName(String name) {
